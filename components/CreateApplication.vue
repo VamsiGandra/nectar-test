@@ -12,18 +12,21 @@
           <v-text-field
             v-model="fullName"
             data-testid="fullName"
+            autocomplete="off"
             :rules="fullNameRules"
             label="Full Name"
           ></v-text-field>
           <v-text-field
-            v-model="requestedAmount"
+            v-model.number="requestedAmount"
+            type="number"
+            autocomplete="off"
             :rules="requestedAmountRules"
             data-testid="requestedAmount"
             label="Requested amount"
           >
           </v-text-field>
           <v-select
-            v-model="termWeeks"
+            v-model.number="termWeeks"
             data-testid="term"
             label="Term(6 months, 1 year, 2 years)"
             :rules="[(v) => !!v || 'Term is required']"
@@ -39,7 +42,7 @@
             :items="statusItems"
           ></v-select>
           <v-text-field
-            v-model="weeklyRepayment"
+            :value="weeklyRepayment"
             data-testid="weeklyRepayment"
             readonly
             label="Weekly repayment"
@@ -72,15 +75,15 @@ export default {
     termItems: [
       {
         text: '6 Months',
-        weeks: 24,
+        weeks: 26,
       },
       {
         text: '1 year',
-        weeks: 48,
+        weeks: 52,
       },
       {
         text: '2 years',
-        weeks: 96,
+        weeks: 104,
       },
     ],
     statusItems: ['approved', 'declined'],
@@ -94,7 +97,7 @@ export default {
   computed: {
     weeklyRepayment() {
       if (this.termWeeks && this.requestedAmount) {
-        return (this.requestedAmount / this.termWeeks).toFixed(2)
+        return parseInt((this.requestedAmount / this.termWeeks).toFixed(2))
       } else {
         return null
       }
@@ -106,8 +109,10 @@ export default {
         const newApplication = {
           fullName: this.fullName,
           requestedAmount: this.requestedAmount,
-          termWeeks: this.termWeeks,
+          term: this.termItems.find((term) => term.weeks === this.termWeeks)
+            .text,
           status: this.status,
+          weeklyRepayment: this.weeklyRepayment,
         }
         this.$emit('new-application', newApplication)
       }

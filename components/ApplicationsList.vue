@@ -13,9 +13,9 @@
       <tbody>
         <tr v-for="(application, i) in applications" :key="i">
           <td>{{ application.fullName }}</td>
-          <td>{{ application.requestedAmount }}</td>
+          <td>$ {{ application.requestedAmount }}</td>
           <td>{{ application.term }}</td>
-          <td>{{ application.weeklyRepayment }}</td>
+          <td>$ {{ application.weeklyRepayment }}</td>
           <td>{{ application.status }}</td>
         </tr>
         <tr v-if="!applications.length">

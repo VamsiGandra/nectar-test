@@ -1,6 +1,6 @@
 <template>
   <v-row justify="center">
-    <v-col cols="8">
+    <v-col sm="12" md="8">
       <v-row justify="center">
         <v-col cols="6"><h1>Applications list</h1> </v-col>
         <v-col cols="6" class="text-right">
@@ -15,6 +15,20 @@
           ></v-col
         >
       </v-row>
+      <ApplicationsList :applications="applications" />
+      <div v-if="applications.length">
+        <v-row>
+          <v-col class="py-0">Total Lended: {{ totalLended }}</v-col>
+        </v-row>
+        <v-row>
+          <v-col class="py-0"
+            >Total weekly payments: {{ totalWeeklyPayment }}</v-col
+          >
+        </v-row>
+        <v-row>
+          <v-col class="py-0">Total declined: {{ totalDeclined }}</v-col>
+        </v-row>
+      </div>
       <v-dialog
         v-if="newApplicationDialog"
         v-model="newApplicationDialog"
@@ -28,17 +42,32 @@
 
 <script>
 import CreateApplication from '~/components/CreateApplication'
+import ApplicationsList from '~/components/ApplicationsList'
 
 export default {
   components: {
     CreateApplication,
+    ApplicationsList,
   },
   data: () => ({
     newApplicationDialog: false,
+    applications: [],
   }),
+  computed: {
+    totalLended() {
+      return this.applications.reduce((a, b) => a + b.requestedAmount, 0)
+    },
+    totalWeeklyPayment() {
+      return this.applications.reduce((a, b) => a + b.weeklyRepayment, 0)
+    },
+    totalDeclined() {
+      return this.applications.reduce((a, b) => a + b.requestedAmount, 0)
+    },
+  },
   methods: {
     createApplication(data) {
       console.log('application created', data)
+      this.applications.push(data)
       this.newApplicationDialog = false
     },
   },

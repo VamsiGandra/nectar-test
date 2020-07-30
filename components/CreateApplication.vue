@@ -10,23 +10,26 @@
           @keyup.native.enter="createApplication"
         >
           <v-text-field
-            v-model="fullName"
+            v-model="application.fullName"
             data-testid="fullName"
             autocomplete="off"
             :rules="fullNameRules"
             label="Full Name"
           ></v-text-field>
           <v-text-field
-            v-model.number="requestedAmount"
+            v-model.number="application.requestedAmount"
             type="number"
             autocomplete="off"
             :rules="requestedAmountRules"
             data-testid="requestedAmount"
             label="Requested amount"
           >
+            <template v-slot:prepend>
+              <div class="mt-2">$</div>
+            </template>
           </v-text-field>
           <v-select
-            v-model.number="termWeeks"
+            v-model.number="application.termWeeks"
             data-testid="term"
             label="Term(6 months, 1 year, 2 years)"
             :rules="[(v) => !!v || 'Term is required']"
@@ -35,7 +38,7 @@
             item-text="text"
           ></v-select>
           <v-select
-            v-model="status"
+            v-model="application.status"
             :rules="[(v) => !!v || 'Status is required']"
             data-testid="status"
             label="Status"
@@ -45,6 +48,7 @@
             :value="weeklyRepayment"
             data-testid="weeklyRepayment"
             readonly
+            type="number"
             label="Weekly repayment"
             placeholder="N/A"
           ></v-text-field>
@@ -68,36 +72,24 @@
 </template>
 
 <script>
+import { Application } from '~/helpers/models'
+import { termItems, statusItems } from '~/helpers/db'
+
 export default {
   data: () => ({
     valid: true,
     lazy: true,
-    termItems: [
-      {
-        text: '6 Months',
-        weeks: 26,
-      },
-      {
-        text: '1 year',
-        weeks: 52,
-      },
-      {
-        text: '2 years',
-        weeks: 104,
-      },
-    ],
-    statusItems: ['approved', 'declined'],
-    fullName: '',
-    requestedAmount: null,
-    termWeeks: null,
-    status: null,
+    termItems: [...termItems],
+    statusItems: [...statusItems],
+    application: { ...Application },
     fullNameRules: [(v) => !!v || 'Full name is required'],
     requestedAmountRules: [(v) => !!v || 'Requested amount is required'],
   }),
   computed: {
     weeklyRepayment() {
-      if (this.termWeeks && this.requestedAmount) {
-        return parseInt((this.requestedAmount / this.termWeeks).toFixed(2))
+      const { termWeeks, requestedAmount } = this.application
+      if (termWeeks && requestedAmount) {
+        return (requestedAmount / termWeeks).toFixed(2)
       } else {
         return null
       }
@@ -107,12 +99,13 @@ export default {
     createApplication() {
       if (this.$refs.form.validate()) {
         const newApplication = {
-          fullName: this.fullName,
-          requestedAmount: this.requestedAmount,
-          term: this.termItems.find((term) => term.weeks === this.termWeeks)
-            .text,
-          status: this.status,
-          weeklyRepayment: this.weeklyRepayment,
+          ...this.application,
+          ...{
+            weeklyRepayment: parseFloat(this.weeklyRepayment),
+            term: this.termItems.find(
+              (term) => term.weeks === this.application.termWeeks
+            ).text,
+          },
         }
         this.$emit('new-application', newApplication)
       }

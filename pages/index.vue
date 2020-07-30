@@ -15,18 +15,44 @@
           ></v-col
         >
       </v-row>
-      <ApplicationsList :applications="applications" />
-      <div v-if="applications.length">
-        <v-row>
-          <v-col class="py-0">Total Lended: {{ totalLended }}</v-col>
+      <v-row>
+        <v-col cols="6">
+          <v-select
+            v-model="filterSelected"
+            prepend-icon="mdi-filter"
+            data-testid="applicationFilter"
+            label="Filter Applications"
+            :items="filterItems"
+          ></v-select>
+        </v-col>
+      </v-row>
+      <ApplicationsList :applications="filteredApplications" />
+      <div v-if="applications.length" class="mt-6">
+        <v-row
+          v-if="
+            filterSelected === applicationStatus.APPROVED ||
+            filterSelected === 'All'
+          "
+        >
+          <v-col class="py-0">Total Lended: $ {{ totalLended }}</v-col>
         </v-row>
-        <v-row>
+        <v-row
+          v-if="
+            filterSelected === applicationStatus.APPROVED ||
+            filterSelected === 'All'
+          "
+        >
           <v-col class="py-0"
-            >Total weekly payments: {{ totalWeeklyPayment }}</v-col
+            >Total weekly payments: $ {{ totalWeeklyPayment }}</v-col
           >
         </v-row>
-        <v-row>
-          <v-col class="py-0">Total declined: {{ totalDeclined }}</v-col>
+        <v-row
+          v-if="
+            filterSelected === applicationStatus.DECLINED ||
+            filterSelected === 'All'
+          "
+        >
+          <v-col class="py-0">Total declined: $ {{ totalDeclined }}</v-col>
         </v-row>
       </div>
       <v-dialog
@@ -44,6 +70,9 @@
 import CreateApplication from '~/components/CreateApplication'
 import ApplicationsList from '~/components/ApplicationsList'
 
+import { ApplicationStatusEnum } from '~/helpers/models'
+import { statusItems } from '~/helpers/db'
+
 export default {
   components: {
     CreateApplication,
@@ -52,16 +81,46 @@ export default {
   data: () => ({
     newApplicationDialog: false,
     applications: [],
+    filterItems: ['All', ...statusItems],
+    filterSelected: 'All',
+    applicationStatus: { ...ApplicationStatusEnum },
   }),
   computed: {
+    approvedApplications() {
+      return this.applications.filter(
+        (application) => application.status === ApplicationStatusEnum.APPROVED
+      )
+    },
+    declinedApplications() {
+      return this.applications.filter(
+        (application) => application.status === ApplicationStatusEnum.DECLINED
+      )
+    },
     totalLended() {
-      return this.applications.reduce((a, b) => a + b.requestedAmount, 0)
+      return this.approvedApplications.reduce(
+        (a, b) => a + b.requestedAmount,
+        0
+      )
     },
     totalWeeklyPayment() {
-      return this.applications.reduce((a, b) => a + b.weeklyRepayment, 0)
+      return this.approvedApplications
+        .reduce((a, b) => a + b.weeklyRepayment, 0)
+        .toFixed(2)
     },
     totalDeclined() {
-      return this.applications.reduce((a, b) => a + b.requestedAmount, 0)
+      return this.declinedApplications.reduce(
+        (a, b) => a + b.requestedAmount,
+        0
+      )
+    },
+    filteredApplications() {
+      if (this.filterSelected === ApplicationStatusEnum.APPROVED) {
+        return this.approvedApplications
+      } else if (this.filterSelected === ApplicationStatusEnum.DECLINED) {
+        return this.declinedApplications
+      } else {
+        return this.applications
+      }
     },
   },
   methods: {

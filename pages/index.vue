@@ -8,6 +8,7 @@
             class="mt-1"
             color="primary"
             rounded
+            data-testid="newApplicationButton"
             large
             @click="newApplicationDialog = true"
           >
@@ -70,7 +71,7 @@
 import CreateApplication from '~/components/CreateApplication'
 import ApplicationsList from '~/components/ApplicationsList'
 
-import { ApplicationStatusEnum } from '~/helpers/models'
+import { ApplicationStatus } from '~/helpers/models'
 import { statusItems } from '~/helpers/db'
 
 export default {
@@ -83,17 +84,17 @@ export default {
     applications: [],
     filterItems: ['All', ...statusItems],
     filterSelected: 'All',
-    applicationStatus: { ...ApplicationStatusEnum },
+    applicationStatus: { ...ApplicationStatus },
   }),
   computed: {
     approvedApplications() {
       return this.applications.filter(
-        (application) => application.status === ApplicationStatusEnum.APPROVED
+        (application) => application.status === ApplicationStatus.APPROVED
       )
     },
     declinedApplications() {
       return this.applications.filter(
-        (application) => application.status === ApplicationStatusEnum.DECLINED
+        (application) => application.status === ApplicationStatus.DECLINED
       )
     },
     totalLended() {
@@ -114,9 +115,9 @@ export default {
       )
     },
     filteredApplications() {
-      if (this.filterSelected === ApplicationStatusEnum.APPROVED) {
+      if (this.filterSelected === ApplicationStatus.APPROVED) {
         return this.approvedApplications
-      } else if (this.filterSelected === ApplicationStatusEnum.DECLINED) {
+      } else if (this.filterSelected === ApplicationStatus.DECLINED) {
         return this.declinedApplications
       } else {
         return this.applications
@@ -125,7 +126,6 @@ export default {
   },
   methods: {
     createApplication(data) {
-      console.log('application created', data)
       this.applications.push(data)
       this.newApplicationDialog = false
     },

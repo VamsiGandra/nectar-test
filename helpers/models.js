@@ -7,7 +7,7 @@ export const Application = {
   weeklyRepayment: null,
 }
 
-export const ApplicationStatusEnum = Object.freeze({
+export const ApplicationStatus = Object.freeze({
   APPROVED: 'Approved',
   DECLINED: 'Declined',
 })

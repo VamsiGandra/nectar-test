@@ -16,18 +16,14 @@
             :rules="fullNameRules"
             label="Full Name"
           ></v-text-field>
-          <v-text-field
+          <CurrencyInput
             v-model.number="application.requestedAmount"
-            type="number"
-            autocomplete="off"
             :rules="requestedAmountRules"
+            autocomplete="off"
             data-testid="requestedAmount"
             label="Requested amount"
           >
-            <template v-slot:prepend>
-              <div class="mt-2">$</div>
-            </template>
-          </v-text-field>
+          </CurrencyInput>
           <v-select
             v-model.number="application.termWeeks"
             data-testid="term"
@@ -51,7 +47,11 @@
             type="number"
             label="Weekly repayment"
             placeholder="N/A"
-          ></v-text-field>
+          >
+            <template v-slot:prepend>
+              <div>$</div>
+            </template>
+          </v-text-field>
         </v-form>
       </v-col>
     </v-row>
@@ -74,22 +74,31 @@
 <script>
 import { Application } from '~/helpers/models'
 import { termItems, statusItems } from '~/helpers/db'
+import CurrencyInput from './CurrencyInput'
 
 export default {
+  components: {
+    CurrencyInput,
+  },
   data: () => ({
     valid: true,
     lazy: true,
     termItems: [...termItems],
     statusItems: [...statusItems],
     application: { ...Application },
-    fullNameRules: [(v) => !!v || 'Full name is required'],
+    fullNameRules: [
+      (v) => !!v || 'Full name is required',
+      (v) =>
+        /^[ A-Za-z-']*$/.test(v) ||
+        `Full name just accepts (a-z or A-Z), space, ' and -`,
+    ],
     requestedAmountRules: [(v) => !!v || 'Requested amount is required'],
   }),
   computed: {
     weeklyRepayment() {
       const { termWeeks, requestedAmount } = this.application
       if (termWeeks && requestedAmount) {
-        return (requestedAmount / termWeeks).toFixed(2)
+        return parseFloat((requestedAmount / termWeeks).toFixed(2))
       } else {
         return null
       }
@@ -101,7 +110,7 @@ export default {
         const newApplication = {
           ...this.application,
           ...{
-            weeklyRepayment: parseFloat(this.weeklyRepayment),
+            weeklyRepayment: this.weeklyRepayment,
             term: this.termItems.find(
               (term) => term.weeks === this.application.termWeeks
             ).text,

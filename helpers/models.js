@@ -5,6 +5,7 @@ export const Application = {
   termWeeks: null,
   status: null,
   weeklyRepayment: null,
+  createdAt: null,
 }
 
 export const ApplicationStatus = Object.freeze({

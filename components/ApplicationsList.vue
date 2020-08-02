@@ -18,9 +18,11 @@
           <td>$ {{ application.weeklyRepayment }}</td>
           <td>{{ application.status }}</td>
         </tr>
-        <tr v-if="!applications.length">
-          No Applications found. Please add by clicking the button above
-        </tr>
+        <v-row v-if="!applications.length">
+          <v-col>
+            No Applications found. Please add by clicking the button above
+          </v-col>
+        </v-row>
       </tbody>
     </template>
   </v-simple-table>
@@ -37,4 +39,8 @@ export default {
 }
 </script>
 
-<style></style>
+<style>
+tbody tr:nth-child(1) {
+  background-color: #cdfeff;
+}
+</style>

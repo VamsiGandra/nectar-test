@@ -114,6 +114,7 @@ export default {
             term: this.termItems.find(
               (term) => term.weeks === this.application.termWeeks
             ).text,
+            createdAt: new Date(),
           },
         }
         this.$emit('new-application', newApplication)

@@ -96,13 +96,16 @@ export default {
     applicationStatus: { ...ApplicationStatus },
   }),
   computed: {
+    sortedApplications() {
+      return this.applications.slice().sort((a, b) => b.createdAt - a.createdAt)
+    },
     approvedApplications() {
-      return this.applications.filter(
+      return this.sortedApplications.filter(
         (application) => application.status === ApplicationStatus.APPROVED
       )
     },
     declinedApplications() {
-      return this.applications.filter(
+      return this.sortedApplications.filter(
         (application) => application.status === ApplicationStatus.DECLINED
       )
     },
@@ -127,7 +130,7 @@ export default {
       } else if (this.filterSelected === ApplicationStatus.DECLINED) {
         return this.declinedApplications
       } else {
-        return this.applications
+        return this.sortedApplications
       }
     },
   },

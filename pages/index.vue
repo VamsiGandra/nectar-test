@@ -35,7 +35,10 @@
             filterSelected === 'All'
           "
         >
-          <v-col class="py-0">Total Lended: $ {{ totalLended }}</v-col>
+          <v-col class="py-0"
+            >Total Lended: $
+            <span data-testid="totalLendedAmount">{{ totalLended }}</span>
+          </v-col>
         </v-row>
         <v-row
           v-if="
@@ -44,8 +47,11 @@
           "
         >
           <v-col class="py-0"
-            >Total weekly payments: $ {{ totalWeeklyPayment }}</v-col
-          >
+            >Total weekly payments: $
+            <span data-testid="totalWeeklyPaymentAmount">{{
+              totalWeeklyPayment
+            }}</span>
+          </v-col>
         </v-row>
         <v-row
           v-if="
@@ -53,7 +59,10 @@
             filterSelected === 'All'
           "
         >
-          <v-col class="py-0">Total declined: $ {{ totalDeclined }}</v-col>
+          <v-col class="py-0"
+            >Total declined: $
+            <span data-testid="totalDeclinedAmount">{{ totalDeclined }}</span>
+          </v-col>
         </v-row>
       </div>
       <v-dialog
@@ -98,10 +107,9 @@ export default {
       )
     },
     totalLended() {
-      return this.approvedApplications.reduce(
-        (a, b) => a + b.requestedAmount,
-        0
-      )
+      return this.approvedApplications
+        .reduce((a, b) => a + b.requestedAmount, 0)
+        .toFixed(2)
     },
     totalWeeklyPayment() {
       return this.approvedApplications
@@ -109,10 +117,9 @@ export default {
         .toFixed(2)
     },
     totalDeclined() {
-      return this.declinedApplications.reduce(
-        (a, b) => a + b.requestedAmount,
-        0
-      )
+      return this.declinedApplications
+        .reduce((a, b) => a + b.requestedAmount, 0)
+        .toFixed(2)
     },
     filteredApplications() {
       if (this.filterSelected === ApplicationStatus.APPROVED) {
